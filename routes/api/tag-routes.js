@@ -43,8 +43,39 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", async (req, res) => {
   // update a tag's name by its `id` value
+  try {
+    // Get the old tag name before the update
+    // find it first so I can use dot notataion to retrieve its name
+    const tag = await Tag.findByPk(req.params.id);
+
+    if (!tag) {
+      res.status(404).json("No category found with this id!");
+      return;
+    }
+    // retrieve old name
+    const oldTagName = tag.tag_name;
+    // update the found id
+    await tag.update(
+      {
+        // All the fields you can update
+        tag_name: req.body.tag_name,
+      },
+      {
+        // Gets the tag based on the id
+        where: {
+          id: req.params.id,
+        },
+      }
+    );
+
+    const responseMessage = ` ${oldTagName}  updated to  ${tag.tag_name}  successfully. `;
+    console.log(responseMessage);
+    res.status(200).json(responseMessage);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 router.delete("/:id", (req, res) => {

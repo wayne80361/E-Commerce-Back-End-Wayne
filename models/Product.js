@@ -24,10 +24,17 @@ Product.init(
       // price tag format with decimal for numbers up to 999.99
       type: DataTypes.DECIMAL(5, 2),
       allowNull: false,
+      validate: {
+        isDecimal: true,
+      },
     },
     stock: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      defaultValue: 10,
+      validate: {
+        isInt: true,
+      },
     },
     // foreign key refer from the category model
     category_id: {

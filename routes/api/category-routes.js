@@ -44,14 +44,44 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.put("/:id", (req, res) => {
-  // update a category by its `id` value
+router.put("/:id", async (req, res) => {
+  // Get the old category name before the update
+  try {
+    // find it first so I can use dot notataion to retrieve its name
+    const category = await Category.findByPk(req.params.id);
+
+    if (!category) {
+      res.status(404).json("No category found with this id!");
+      return;
+    }
+    // retrieve old name
+    const oldCategoryName = category.category_name;
+    // update the found id
+    await category.update(
+      {
+        // All the fields you can update
+        category_name: req.body.category_name,
+      },
+      {
+        // Gets the category based on the id
+        where: {
+          id: req.params.id,
+        },
+      }
+    );
+
+    const responseMessage = ` ${oldCategoryName}  updated to  ${category.category_name}  successfully. `;
+    console.log(responseMessage);
+    res.status(200).json(responseMessage);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 router.delete("/:id", async (req, res) => {
   // delete a category by its `id` value
   try {
-    // find it first so I can use dot notataion to retrive its name
+    // find it first so I can use dot notataion to retrieve its name
     const category = await Category.findByPk(req.params.id);
 
     if (!category) {
